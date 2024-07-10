@@ -12,35 +12,28 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true // Force HTTPS for all Cloudinary operations
 });
 
 // GET ALL POSTS
 router.route("/").get(async (req, res) => {
-  try {
-    const posts = await Post.find({});
-    const securedPosts = posts.map(post => ({
-      ...post._doc,
-      photo: post.photo.replace('http://', 'https://')
-    }));
-    res.status(200).json({ success: true, data: securedPosts });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error });
-  }
+    try {
+        const posts = await Post.find({});
+        res.status(200).json({ success : true, data: posts });
+    } catch (error) {
+        res.status(500).json({ success : false, message: error });   
+    }
 });
 
 // CREATE A POST
 router.route("/").post(async (req, res) => {
   try {
     const { name, prompt, photo } = req.body;
-    const photoUrl = await cloudinary.uploader.upload(photo, {
-      secure: true // Force HTTPS for this upload
-    });
+    const photoUrl = await cloudinary.uploader.upload(photo);
 
     const newPost = await Post.create({
       name,
       prompt,
-      photo: photoUrl.secure_url, // Use secure_url instead of url
+      photo: photoUrl.url,
     });
 
     res.status(201).json({ success: true, data: newPost });
@@ -48,5 +41,4 @@ router.route("/").post(async (req, res) => {
     res.status(500).json({ success: false, message: error });
   }
 });
-
 export default router;
