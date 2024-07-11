@@ -30,11 +30,14 @@ router.route("/").post(async (req, res) => {
     const { name, prompt, photo } = req.body;
     const photoUrl = await cloudinary.uploader.upload(photo);
 
+    const httpsPhotoUrl = photoUrl.url.replace('http://', 'https://');
+
     const newPost = await Post.create({
       name,
       prompt,
-      photo: photoUrl.url,
+      photo: httpsPhotoUrl,
     });
+
 
     res.status(201).json({ success: true, data: newPost });
   } catch (error) {

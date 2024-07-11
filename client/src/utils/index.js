@@ -12,7 +12,9 @@ export function getRandomPrompt(prompt) {
 
 export async function downloadImage(_id, photo) {
   try {
-    const response = await fetch(photo);
+    // Ensure the photo URL uses HTTPS
+    const httpsPhotoUrl = photo.replace('http://', 'https://');
+    const response = await fetch(httpsPhotoUrl);
     if (!response.ok) {
       throw new Error('Failed to fetch image');
     }
